@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rizkia Sekar Defi Azzahra</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#f8f1e4;--ink:#2b211c;--red:#c8102e;--green:#0f5132;--panel:rgba(255,252,245,.92);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;line-height:1.6}
+#c{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+header{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:16px 4vw;gap:12px;flex-wrap:wrap}
+header nav,.langs{display:flex;gap:6px}
+button{font:inherit;color:var(--ink);background:transparent;border:1.5px solid transparent;border-radius:999px;padding:6px 16px;cursor:pointer}
+button:hover{border-color:var(--red)}
+button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+button.on{background:var(--red);color:#fff}
+.brand{font-family:"DM Serif Display",Georgia,serif;font-size:1.4rem;color:var(--red)}
+.ui{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:0;transition:opacity .5s;visibility:hidden}
+.ui.on{opacity:1;visibility:visible}
+#homeUI .txt{position:absolute;left:6vw;top:50%;transform:translateY(-50%);max-width:min(540px,44vw)}
+h1{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:clamp(2.3rem,5vw,4.2rem);line-height:1.05;margin:0 0 18px;color:var(--red)}
+.phil{font-size:1.2rem;margin:0 0 28px;max-width:32ch;border-left:4px solid var(--green);padding-left:14px}
+.cta{pointer-events:auto;background:var(--green);color:#fff;padding:11px 28px;font-weight:600}
+.cta:hover{border-color:var(--red)}
+#intro{position:absolute;left:0;right:0;top:34%;text-align:center;transition:opacity .4s}
+#intro h2{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:clamp(2rem,5vw,3.6rem);margin:0;color:var(--red)}
+#intro p{margin:6px 0 0}
+#panel{position:absolute;left:50%;bottom:6vh;width:min(640px,90vw);transform:translate(-50%,16px);background:var(--panel);border-top:5px solid var(--red);border-radius:4px;padding:16px 24px;opacity:0;transition:opacity .45s,transform .45s}
+#panel.show{opacity:1;transform:translate(-50%,0)}
+body.zoom #panel{opacity:0}
+#panel .tag{color:var(--green);font-weight:600;font-size:.9rem}
+#panel h3{font-family:"DM Serif Display",Georgia,serif;font-weight:400;margin:2px 0 0;font-size:1.6rem;color:var(--red)}
+#panel h4{margin:0 0 8px;font-weight:600;font-size:1rem;color:var(--green)}
+#panel p{margin:0;max-width:62ch}
+#dots{position:absolute;right:3vw;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px}
+#dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--red);transition:background .3s}
+#dots i.on{background:var(--green);border-color:var(--green)}
+#veil{position:fixed;inset:0;z-index:3;background:rgba(248,241,228,.78);opacity:0;pointer-events:none;transition:opacity .5s}
+body.zoom #veil{opacity:1}
+#cap{position:fixed;left:50%;top:79%;transform:translateX(-50%);z-index:4;text-align:center;opacity:0;transition:opacity .4s;pointer-events:none;width:min(560px,90vw)}
+#cap.show{opacity:1}
+#cap b{display:block;font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:1.7rem;color:var(--red)}
+#cap span{font-size:.95rem;color:var(--green)}
+#spacer{position:relative;z-index:1;height:0}
+#wipe{position:fixed;inset:0;z-index:20;pointer-events:none;display:flex}
+#wipe b{flex:1;transform:translateY(-101%);transition:transform .45s cubic-bezier(.7,0,.3,1)}
+#wipe b:nth-child(1){background:var(--red)}#wipe b:nth-child(2){background:#fff;transition-delay:.08s}#wipe b:nth-child(3){background:var(--green);transition-delay:.16s}
+#wipe.in b{transform:translateY(0)}
+#wipe.out b{transform:translateY(101%)}
+#wipe.rst b{transition:none;transform:translateY(-101%)}
+@media (max-width:760px){#homeUI .txt{top:auto;bottom:6vh;transform:none;max-width:88vw}}
+@media (prefers-reduced-motion:reduce){.ui,#panel,#intro,#veil,#cap{transition:none}}
+</style>
+</head>
+<body data-page="home">
+<canvas id="c" aria-hidden="true"></canvas>
+<header>
+  <span class="brand">Rizkia</span>
+  <nav><button id="nHome" class="on" data-i="navHome"></button><button id="nJ" data-i="navJ"></button></nav>
+  <div class="langs"><button data-lang="id" class="on">ID</button><button data-lang="en">EN</button><button data-lang="zh">中文</button></div>
+</header>
+<section id="homeUI" class="ui on">
+  <div class="txt">
+    <h1>Rizkia Sekar Defi Azzahra</h1>
+    <p class="phil" data-i="phil"></p>
+    <button class="cta" id="cta" data-i="cta"></button>
+  </div>
+</section>
+<section id="jUI" class="ui">
+  <div id="intro"><h2 data-i="jTitle"></h2><p data-i="hint"></p></div>
+  <div id="panel"><div class="tag" id="pTag"></div><h3 id="pTtl"></h3><h4 id="pSch"></h4><p id="pTxt"></p></div>
+  <div id="dots"><i></i><i></i><i></i></div>
+</section>
+<div id="veil"></div>
+<div id="cap"><b id="cT"></b><span id="cH"></span></div>
+<div id="wipe"><b></b><b></b><b></b></div>
+<div id="spacer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ===== FOTO: isi path/URL gambar di sini untuk mengganti placeholder ===== */
+const PHOTOS={home:"",smp_school:"",smp_me:"",sma_school:"",sma_me:"",kuliah_school:"",kuliah_me:""};
+
+const L={
+id:{navHome:"Beranda",navJ:"Perjalananku",phil:"Setiap langkah kecil adalah akar dari tumbuh yang besar.",cta:"Lihat perjalananku",jTitle:"Perjalananku",hint:"Gulir ke bawah untuk berjalan maju. Klik foto untuk memperbesar.",close:"Klik di mana saja untuk menutup",
+ st:[{tag:"2016 - 2019",t:"Masa SMP",s:"SMP Negeri 1 (contoh)",p:"Awal dari rasa ingin tahu. Di sini aku berani bertanya, mencoba ekskul pertama, dan menemukan teman yang masih berarti sampai sekarang."},
+ {tag:"2019 - 2022",t:"Masa SMA",s:"SMA Negeri 1 (contoh)",p:"Masa mencari jati diri. Aku mulai tahu apa yang kusuka, belajar mengatur waktu, dan berani memegang tanggung jawab yang lebih besar."},
+ {tag:"2022 - 2025",t:"Masa kuliah",s:"Universitas (contoh)",p:"Dunia terasa lebih luas. Aku belajar mandiri, membangun proyek nyata, dan menyiapkan langkah berikutnya."}]},
+en:{navHome:"Home",navJ:"My Journey",phil:"Every small step is the root of great growth.",cta:"See my journey",jTitle:"My Journey",hint:"Scroll down to walk forward. Click a photo to enlarge it.",close:"Click anywhere to close",
+ st:[{tag:"2016 - 2019",t:"Junior high",s:"Junior High School 1 (sample)",p:"Where curiosity began. I learned to ask questions, tried my first club, and met friends who still matter today."},
+ {tag:"2019 - 2022",t:"Senior high",s:"Senior High School 1 (sample)",p:"A time of finding myself. I learned what I love, how to manage my time, and how to carry bigger responsibilities."},
+ {tag:"2022 - 2025",t:"University",s:"University (sample)",p:"The world felt wider. I learned independence, built real projects, and prepared for the next step."}]},
+zh:{navHome:"首页",navJ:"我的旅程",phil:"每一小步，都是成长的根。",cta:"查看我的旅程",jTitle:"我的旅程",hint:"向下滚动前行，点击照片可放大。",close:"点击任意处关闭",
+ st:[{tag:"2016 - 2019",t:"初中时光",s:"第一中学（示例）",p:"好奇心开始的地方。我学会了提问，参加了第一个社团，也遇到了至今仍重要的朋友。"},
+ {tag:"2019 - 2022",t:"高中时光",s:"第一高中（示例）",p:"寻找自我的阶段。我知道了自己喜欢什么，学会安排时间，也敢于承担更大的责任。"},
+ {tag:"2022 - 2025",t:"大学时光",s:"大学（示例）",p:"世界变得更宽广。我学会独立，做出真实的项目，并为下一步做准备。"}]}};
+
+const cv=document.getElementById('c');
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(55,1,.1,80);scene.add(cam);
+scene.fog=new THREE.Fog(0xf8f1e4,10,38);
+scene.add(new THREE.AmbientLight(0xffffff,.9));
+const sun=new THREE.DirectionalLight(0xffffff,.7);sun.position.set(3,6,6);scene.add(sun);
+const RED=0xc8102e,GREEN=0x0f5132;
+const std=c=>new THREE.MeshStandardMaterial({color:c,roughness:.8});
+
+function ph(kind,label,w,h){const c=document.createElement('canvas');c.width=400;c.height=Math.round(400*h/w);const x=c.getContext('2d'),W=c.width,H=c.height;
+ const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#fffaf0');g.addColorStop(1,'#ead9bb');x.fillStyle=g;x.fillRect(0,0,W,H);
+ if(kind==='me'){x.fillStyle='#0f5132';x.beginPath();x.arc(W/2,H*.38,W*.17,0,7);x.fill();x.beginPath();x.ellipse(W/2,H*.9,W*.3,H*.28,0,0,7);x.fill();}
+ else{x.fillStyle='#c8102e';x.fillRect(W*.2,H*.4,W*.6,H*.4);x.beginPath();x.moveTo(W*.14,H*.4);x.lineTo(W/2,H*.18);x.lineTo(W*.86,H*.4);x.fill();x.fillStyle='#fffaf0';for(let i=0;i<3;i++)x.fillRect(W*(.28+i*.18),H*.52,W*.1,H*.13);}
+ x.fillStyle='#2b211c';x.font='600 '+Math.round(W*.06)+'px sans-serif';x.textAlign='center';x.fillText(label,W/2,H*.95);
+ return new THREE.CanvasTexture(c);}
+function cover(t,fa){const ia=t.image.width/t.image.height;if(ia>fa){t.repeat.set(fa/ia,1);t.offset.set((1-fa/ia)/2,0)}else{t.repeat.set(1,ia/fa);t.offset.set(0,(1-ia/fa)/2)}}
+function frame(key,kind,label,w,h){const g=new THREE.Group();
+ g.add(new THREE.Mesh(new THREE.BoxGeometry(w+.3,h+.3,.14),std(RED)));
+ const m=new THREE.MeshBasicMaterial({map:ph(kind,label,w,h)});const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);p.position.z=.08;g.add(p);
+ if(PHOTOS[key])new THREE.TextureLoader().load(PHOTOS[key],t=>{cover(t,w/h);m.map=t;m.needsUpdate=true});
+ return g;}
+function label(txt){const c=document.createElement('canvas');c.width=512;c.height=160;const x=c.getContext('2d');x.font='110px "DM Serif Display",Georgia,serif';x.textAlign='center';x.fillStyle='#c8102e';x.fillText(txt,256,115);
+ const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true}));s.scale.set(5,1.56,1);return s;}
+
+/* HOME */
+const H=new THREE.Group();scene.add(H);
+const hf=frame('home','me','FOTO',3,3.75);H.add(hf);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(3.1,.07,12,64),std(GREEN));ring.position.z=-.4;H.add(ring);
+const orb=new THREE.Group();H.add(orb);
+for(let i=0;i<14;i++){const a=i/14*6.283,m=new THREE.Mesh(i%2?new THREE.IcosahedronGeometry(.16,0):new THREE.OctahedronGeometry(.2,0),std(i%2?GREEN:RED));m.position.set(Math.cos(a)*3.6,Math.sin(i*1.7)*1.6,Math.sin(a)*3.6*.6);orb.add(m);}
+
+/* JOURNEY: galeri dengan karpet merah dan pilar hijau */
+const J=new THREE.Group();J.visible=false;scene.add(J);
+const S=[{z:-10,k:'smp',l:'SMP'},{z:-28,k:'sma',l:'SMA'},{z:-46,k:'kuliah',l:'Kuliah'}],CL=[];
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(14,80),std(0xefe3cb));floor.rotation.x=-Math.PI/2;floor.position.set(0,-2.4,-25);J.add(floor);
+const rug=new THREE.Mesh(new THREE.PlaneGeometry(1.8,80),std(RED));rug.rotation.x=-Math.PI/2;rug.position.set(0,-2.39,-25);J.add(rug);
+S.forEach((s,i)=>{const sc=frame(s.k+'_school','school','FOTO SEKOLAH',2.8,2.1);sc.position.set(-3.3,.7,s.z);sc.rotation.y=.35;
+ const me=frame(s.k+'_me','me','FOTO AKU',2.2,2.75);me.position.set(3.3,.9,s.z);me.rotation.y=-.35;
+ [[sc,'school'],[me,'me']].forEach(([f,kind])=>{const pl=f.children[1];pl.userData={fr:f,i,kind};CL.push(pl)});
+ s.f=[sc,me];J.add(sc,me);
+ const r=new THREE.Mesh(new THREE.TorusGeometry(1.5,.07,12,48),std(GREEN));r.rotation.x=Math.PI/2;r.position.set(0,-2.35,s.z);J.add(r);
+ const lb=label(s.l);lb.position.set(0,1.4,s.z-1.5);J.add(lb);});
+for(let i=0;i<22;i++){const side=i%2?1:-1,z=4-Math.floor(i/2)*5.2,t=new THREE.Group();
+ const col=new THREE.Mesh(new THREE.CylinderGeometry(.3,.36,5,16),std(GREEN));col.position.y=.1;
+ const cap=new THREE.Mesh(new THREE.BoxGeometry(.9,.2,.9),std(0xffffff));cap.position.y=2.7;t.add(col,cap);t.position.set(side*6.4,0,z);J.add(t);}
+const pg=new THREE.BufferGeometry(),N=200,pos=new Float32Array(N*3),cl=new Float32Array(N*3);
+for(let i=0;i<N;i++){pos.set([(Math.random()-.5)*16,Math.random()*6-2,4-Math.random()*56],i*3);const c=new THREE.Color(i%2?GREEN:RED);cl.set([c.r,c.g,c.b],i*3);}
+pg.setAttribute('position',new THREE.BufferAttribute(pos,3));pg.setAttribute('color',new THREE.BufferAttribute(cl,3));
+J.add(new THREE.Points(pg,new THREE.PointsMaterial({size:.12,vertexColors:true})));
+
+/* VIEWER: foto terbang dari bingkai ke tengah layar */
+const V=new THREE.Group(),vb=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:RED,fog:false})),vp=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial());
+vp.position.z=.001;V.add(vb,vp);V.visible=false;cam.add(V);
+let zm=null,hov=null;
+const rc=new THREE.Raycaster(),mv=new THREE.Vector2(),wp=new THREE.Vector3();
+function pick(e){mv.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);rc.setFromCamera(mv,cam);const h=rc.intersectObjects(CL);return h.length?h[0].object:null}
+function openZ(pl){const g=pl.geometry.parameters;zm={pl,fr:pl.userData.fr,w:g.width,h:g.height,t:0,dir:1};
+ vp.material=pl.material;vb.scale.set(1+.3/g.width,1+.3/g.height,1);V.visible=true;zm.fr.visible=false;
+ const st=L[lang].st[pl.userData.i];$('cT').textContent=pl.userData.kind==='school'?st.s:st.t+', '+st.tag;$('cH').textContent=L[lang].close;
+ document.body.classList.add('zoom');document.documentElement.style.overflow='hidden';document.body.style.cursor='';}
+function closeZ(){if(zm&&zm.dir>0){zm.dir=-1;$('cap').classList.remove('show');document.body.classList.remove('zoom')}}
+function stepZ(dt){if(!zm)return;zm.t=Math.min(1,Math.max(0,zm.t+zm.dir*dt/.8));const e=1-Math.pow(1-zm.t,3);
+ zm.pl.getWorldPosition(wp);cam.worldToLocal(wp);
+ const d=5,th=2*d*Math.tan(cam.fov*Math.PI/360)*.5,w=zm.w,h=zm.h,s=th/h;
+ V.position.set(wp.x*(1-e),wp.y*(1-e),wp.z+(-d-wp.z)*e);V.scale.set(w+(w*s-w)*e,h+(th-h)*e,1);V.rotation.y=zm.fr.rotation.y*(1-e);
+ if(zm.dir>0&&zm.t>.85)$('cap').classList.add('show');
+ if(zm.dir<0&&zm.t<=0){V.visible=false;zm.fr.visible=true;zm=null;document.documentElement.style.overflow='';}}
+
+/* UI */
+let page='home',lang='id',camZ=6,mx=0,my=0,active=-2,dive=0,diveT=0,busy=false;
+const $=id=>document.getElementById(id),spacer=$('spacer'),dots=[...document.querySelectorAll('#dots i')];
+function setLang(l){lang=l;document.documentElement.lang=l;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=L[l][e.dataset.i]);
+ document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));showStage(active,true);
+ try{localStorage.setItem('lang',l)}catch(e){}}
+function showStage(i,force){if(i===active&&!force)return;active=i;const p=$('panel');
+ if(i<0){p.classList.remove('show')}else{const s=L[lang].st[i];$('pTag').textContent=s.tag;$('pTtl').textContent=s.t;$('pSch').textContent=s.s;$('pTxt').textContent=s.p;p.classList.add('show')}
+ dots.forEach((d,j)=>d.classList.toggle('on',j===i));}
+function go(p){page=p;H.visible=p==='home';J.visible=p==='journey';spacer.style.height=p==='journey'?'450vh':'0';scrollTo(0,0);camZ=6;diveT=0;dive=0;
+ $('homeUI').classList.toggle('on',p==='home');$('jUI').classList.toggle('on',p==='journey');
+ $('nHome').classList.toggle('on',p==='home');$('nJ').classList.toggle('on',p==='journey');showStage(-1,true);}
+function warp(p){if(busy||p===page||zm)return;
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches){go(p);return}
+ busy=true;const w=$('wipe');diveT=1;w.className='in';
+ setTimeout(()=>{go(p);w.className='out'},720);
+ setTimeout(()=>{w.className='rst'},1300);
+ setTimeout(()=>{w.className='';busy=false},1360);}
+$('nHome').onclick=()=>warp('home');$('nJ').onclick=()=>warp('journey');$('cta').onclick=()=>warp('journey');
+document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;
+ if(page==='journey'&&!zm&&!busy){hov=pick(e);document.body.style.cursor=hov?'pointer':''}});
+addEventListener('click',e=>{if(e.target.closest('header'))return;if(zm){closeZ();return}
+ if(page!=='journey'||busy)return;const h=pick(e);if(h)openZ(h)});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeZ()});
+function resize(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();
+ const wide=w/h>1.1&&w>760;H.position.set(wide?2.6:0,wide?0:1.4,0);H.scale.setScalar(wide?1:.7);}
+addEventListener('resize',resize);resize();
+
+const clock=new THREE.Clock();
+function tick(){requestAnimationFrame(tick);const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime;
+ if(page==='home'){dive+=(diveT-dive)*.05;H.rotation.y+=(mx*.4-H.rotation.y)*.05;H.rotation.x+=(my*.25-H.rotation.x)*.05;hf.position.y=Math.sin(t)*.12;orb.rotation.y=t*.25+dive*3;ring.rotation.z=t*.1;
+  cam.position.set(0,0,7-dive*3.2);cam.lookAt(H.position.x*.4,H.position.y*.4,0);}
+ else{const max=document.documentElement.scrollHeight-innerHeight,p=max>0?scrollY/max:0;camZ+=((6-p*46)-camZ)*.08;
+  cam.position.set(Math.sin(t*.4)*.3,.5+Math.cos(t*.3)*.1,camZ);cam.lookAt(0,.3,camZ-10);
+  S.forEach(s=>s.f.forEach((f,j)=>{f.position.y=(j?.9:.7)+Math.sin(t+s.z+j)*.12;const tg=hov&&hov.userData.fr===f&&!zm?1.07:1;f.scale.setScalar(f.scale.x+(tg-f.scale.x)*.15)}));
+  showStage(S.findIndex(s=>{const d=camZ-s.z;return d>3&&d<13}));
+  $('intro').style.opacity=camZ>3.5?1:0;
+  cam.updateMatrixWorld();stepZ(dt);}
+ R.render(scene,cam);}
+let saved='id';try{saved=localStorage.getItem('lang')||'id'}catch(e){}
+setLang(L[saved]?saved:'id');tick();
+</script>
+</body>
+</html>
