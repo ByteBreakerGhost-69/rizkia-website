@@ -9,7 +9,8 @@
 :root{--bg:#f8f1e4;--ink:#2b211c;--red:#c8102e;--green:#0f5132;--panel:rgba(255,252,245,.92);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;line-height:1.6}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;line-height:1.6;touch-action:pan-y}
+body.jr{cursor:grab}body.drag{cursor:grabbing}
 #c{position:fixed;inset:0;width:100%;height:100%;z-index:0}
 header{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:16px 4vw;gap:12px;flex-wrap:wrap}
 header nav,.langs{display:flex;gap:6px}
@@ -30,6 +31,8 @@ h1{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:clamp(
 .pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#7cfc9a;animation:pulse 1.8s infinite}
 .stat b{display:block;font-weight:600;line-height:1.35}
 @keyframes pulse{50%{opacity:.3}}
+#outro{position:absolute;left:0;right:0;top:16%;text-align:center;opacity:0;padding:0 6vw}
+#outro h2{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:clamp(1.8rem,4.5vw,3rem);color:var(--red);margin:0}
 #intro{position:absolute;left:0;right:0;top:20%;text-align:center}
 #intro h2{font-family:"DM Serif Display",Georgia,serif;font-weight:400;font-size:clamp(2rem,5vw,3.6rem);margin:0;color:var(--red)}
 #intro p{margin:6px 0 0}
@@ -74,15 +77,20 @@ button{padding:8px 12px;min-height:40px;font-size:.88rem}
 #dots{right:2vw}
 #ex,#ex.l,#ex.r{top:57%;left:6vw;right:6vw;width:auto;max-height:36vh;overflow-y:auto;pointer-events:auto;transform:translateY(10px)}
 #ex.show{transform:none}
+#ex:not(.show),#panel:not(.show){pointer-events:none}
+.cta{padding:8px 18px;font-size:.85rem;min-height:36px}
 #ex h2{font-size:1.5rem}#ex p{font-size:.95rem}
 }
 @media (prefers-reduced-motion:reduce){.ui,#panel,#veil,#ex{transition:none}}
-.nv{display:none}
+.nv,.gy{display:none}
 @media (max-width:760px),(max-aspect-ratio:9/10){
 .nv{display:flex;position:absolute;bottom:3vh;width:38px;height:38px;min-height:0;padding:0;border-radius:50%;background:var(--red);color:#fff;align-items:center;justify-content:center;pointer-events:auto;transition:opacity .3s}
 .nv svg{width:18px;height:18px}
 #bPrev{left:2vw}#bNext{right:2vw}
-.nv.off,body.zoom .nv{opacity:0;pointer-events:none}
+.nv.off,body.zoom .nv,body.zoom .gy{opacity:0;pointer-events:none}
+.gy{display:flex;position:absolute;top:calc(env(safe-area-inset-top,0px) + 62px);right:3vw;width:38px;height:38px;min-height:0;padding:0;border-radius:50%;background:var(--green);color:#fff;align-items:center;justify-content:center;pointer-events:auto;transition:opacity .3s;opacity:.75}
+.gy.act{opacity:1;outline:2px solid var(--red)}
+.gy svg{width:18px;height:18px}
 #panel{width:calc(100vw - 104px)}
 }
 </style>
@@ -103,10 +111,12 @@ button{padding:8px 12px;min-height:40px;font-size:.88rem}
   </div>
 </section>
 <section id="jUI" class="ui">
+  <div id="outro"><h2 data-i="outro"></h2></div>
   <div id="intro"><h2 data-i="jTitle"></h2><p data-i="hint"></p></div>
   <div id="panel"><div class="tag" id="pTag"></div><h3 id="pTtl"></h3><h4 id="pSch"></h4><p id="pTxt"></p></div>
   <div id="dots"><i></i><i></i><i></i><i></i></div>
   <button class="nv off" id="bPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button class="gy" id="bGyro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg></button>
   <button class="nv" id="bNext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
 </section>
 <div id="veil"></div>
@@ -117,20 +127,20 @@ button{padding:8px 12px;min-height:40px;font-size:.88rem}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ===== FOTO: isi path/URL gambar di sini untuk mengganti placeholder ===== */
-const PHOTOS={home:"images/rizkia.jpeg",smp_school:"",smp_me:"",cn_school:"",cn_me:"",sma_school:"images/smamio.jpeg",sma_me:"",kuliah_school:"images/jiangsu.png",kuliah_me:"images/rizkia-kuliah.jpeg"};
+const PHOTOS={home:"",smp_school:"",smp_me:"",cn_school:"",cn_me:"",sma_school:"",sma_me:"",kuliah_school:"",kuliah_me:""};
 
 const L={
-id:{stPill:"Statusku sekarang",stText:"Mahasiswa di Jiangsu Vocational Institute of Commerce",navHome:"Beranda",navJ:"Perjalananku",phil:"Setiap langkah kecil adalah akar dari tumbuh yang besar.",cta:"Lihat perjalananku",jTitle:"Perjalananku",hint:"Gulir ke bawah untuk berjalan maju. Klik foto untuk memperbesar.",close:"Klik di mana saja untuk menutup",prev:"Sebelumnya",next:"Berikutnya",
+id:{stPill:"Statusku sekarang",stText:"Mahasiswa di Jiangsu Vocational Institute of Commerce",navHome:"Beranda",navJ:"Perjalananku",phil:"Setiap langkah kecil adalah akar dari tumbuh yang besar.",cta:"Lihat perjalananku",jTitle:"Perjalananku",hint:"Gulir ke bawah untuk berjalan maju. Klik foto untuk memperbesar. Geser untuk melihat sekeliling.",close:"Klik di mana saja untuk menutup",prev:"Sebelumnya",outro:"Perjalanan masih panjang",gyro:"Lihat sekeliling dengan sensor HP",next:"Berikutnya",
  st:[{tag:"2016 - 2019",t:"Masa SMP",s:"SMP Muhammadiyah 12 GKB Gresik (Spemdalas)",p:"Awal dari rasa ingin tahu. Spemdalas dikenal sebagai sekolah berbasis teknologi digital pertama di Gresik dengan kurikulum bergaya internasional. Di sini aku berani bertanya, mencoba ekskul pertama, dan menemukan teman yang masih berarti sampai sekarang.",a:"Sekolah swasta unggulan yang dikenal sebagai pelopor sekolah teknologi digital di Gresik. Banyak kebiasaan belajarku dimulai dari sini.",b:"Aku di masa SMP, penuh rasa ingin tahu dan baru mengenal ekskul pertamaku. Waktu itu semuanya terasa baru."},
  {tag:"Sejak kelas 7 SMP",t:"Kursus bahasa Mandarin",s:"Shanhai Zhonghua, Gresik",p:"Di awal kelas 7 aku mulai kursus di Shanhai Zhonghua, Gresik, lembaga yang fokus pada Mandarin intensif, persiapan ujian HSK, penerjemahan, hingga program beasiswa ke China. Awalnya aku hanya penasaran pada aksaranya, lama-lama jatuh cinta pada bahasa dan budayanya. Latihan nada dan goresan tiap pekan menjadi bekal besar sampai aku berani kuliah di Jiangsu.",a:"Shanhai Zhonghua di Gresik, tempat aku pertama kali menulis aksara Mandarin. Goresan pertamaku berantakan, tapi dari sinilah semuanya dimulai.",b:"Aku di awal kelas 7, masih terbata-bata tapi semangat mengulang nada demi nada sampai terdengar benar."},
  {tag:"2019 - 2022",t:"Masa SMA",s:"SMA Muhammadiyah 10 GKB Gresik (Smamio)",p:"Di Smamio aku belajar di sekolah yang menekankan karier dan riset. Aku mulai tahu apa yang kusuka, melatih kebiasaan meneliti, dan berani memegang tanggung jawab yang lebih besar.",a:"Sekolah yang mengusung konsep Career and Research School. Di sini karakterku dibentuk dan cara berpikir risetku mulai tumbuh.",b:"Aku di masa SMA, mulai tahu arah yang ingin kutuju dan terbiasa mencari jawaban lewat riset."},
  {tag:"2022 - 2025",t:"Masa kuliah",s:"Jiangsu Vocational Institute of Commerce",p:"Dunia terasa lebih luas. Aku belajar mandiri, membangun proyek nyata, dan menyiapkan langkah berikutnya.",a:"Kampus di Jiangsu, Tiongkok, tempat duniaku terasa makin luas dan tantangannya makin nyata.",b:"Aku di masa kuliah, belajar mandiri dan membangun proyek yang benar-benar dipakai orang."}]},
-en:{stPill:"My status now",stText:"Student at Jiangsu Vocational Institute of Commerce",navHome:"Home",navJ:"My Journey",phil:"Every small step is the root of great growth.",cta:"See my journey",jTitle:"My Journey",hint:"Scroll down to walk forward. Click a photo to enlarge it.",close:"Click anywhere to close",prev:"Previous",next:"Next",
+en:{stPill:"My status now",stText:"Student at Jiangsu Vocational Institute of Commerce",navHome:"Home",navJ:"My Journey",phil:"Every small step is the root of great growth.",cta:"See my journey",jTitle:"My Journey",hint:"Scroll down to walk forward. Click a photo to enlarge it. Drag to look around.",close:"Click anywhere to close",prev:"Previous",outro:"The journey is still long",gyro:"Look around with phone motion",next:"Next",
  st:[{tag:"2016 - 2019",t:"Junior high",s:"SMP Muhammadiyah 12 GKB Gresik (Spemdalas)",p:"Where curiosity began. Spemdalas is known as the first digital-technology school in Gresik, with an international-style curriculum. Here I learned to ask questions, tried my first club, and met friends who still matter today.",a:"A leading private school known as a digital-technology pioneer in Gresik. Many of my study habits started here.",b:"Me in junior high, full of curiosity and just discovering my first club. Everything felt new."},
  {tag:"Since grade 7",t:"Mandarin course",s:"Shanhai Zhonghua, Gresik",p:"At the start of grade 7 I began studying at Shanhai Zhonghua in Gresik, an institute focused on intensive Mandarin, HSK exam prep, translation, and scholarship programs for China. At first I was only curious about the characters, then I fell in love with the language and culture. Weekly tone and stroke practice became a big foundation, until I felt brave enough to study in Jiangsu.",a:"Shanhai Zhonghua in Gresik, where I first wrote Chinese characters. My first strokes were messy, but this is where it all began.",b:"Me at the start of grade 7, still stumbling but eager to repeat each tone until it sounded right."},
  {tag:"2019 - 2022",t:"Senior high",s:"SMA Muhammadiyah 10 GKB Gresik (Smamio)",p:"At Smamio I studied at a school that stresses career and research. I learned what I love, built a habit of doing research, and took on bigger responsibilities.",a:"A school built around the Career and Research School concept. My character was shaped here and my research mindset began to grow.",b:"Me in senior high, starting to know the direction I wanted and getting used to finding answers through research."},
  {tag:"2022 - 2025",t:"University",s:"Jiangsu Vocational Institute of Commerce",p:"The world felt wider. I learned independence, built real projects, and prepared for the next step.",a:"The campus in Jiangsu, China, where my world grew wider and the challenges became real.",b:"Me at university, learning independence and building projects people actually use."}]},
-zh:{stPill:"目前身份",stText:"江苏商贸职业学院学生",navHome:"首页",navJ:"我的旅程",phil:"每一小步，都是成长的根。",cta:"查看我的旅程",jTitle:"我的旅程",hint:"向下滚动前行，点击照片可放大。",close:"点击任意处关闭",prev:"上一个",next:"下一个",
+zh:{stPill:"目前身份",stText:"江苏商贸职业学院学生",navHome:"首页",navJ:"我的旅程",phil:"每一小步，都是成长的根。",cta:"查看我的旅程",jTitle:"我的旅程",hint:"向下滚动前行，点击照片可放大，拖动可环顾四周。",close:"点击任意处关闭",prev:"上一个",outro:"旅程还很长",gyro:"用手机动作环顾四周",next:"下一个",
  st:[{tag:"2016 - 2019",t:"初中时光",s:"SMP Muhammadiyah 12 GKB Gresik (Spemdalas)",p:"好奇心开始的地方。Spemdalas 被称为格雷西克第一所数字科技学校，采用国际风格的课程。我在这里学会提问，参加了第一个社团，也遇到了至今仍重要的朋友。",a:"一所杰出的私立学校，是格雷西克数字科技学校的先行者。我许多学习习惯从这里开始。",b:"初中的我，充满好奇，刚加入第一个社团，一切都很新鲜。"},
  {tag:"初一起",t:"中文课程",s:"Shanhai Zhonghua, Gresik",p:"初一开学时，我开始在格雷西克的 Shanhai Zhonghua 学习，这是一所专注于中文强化、HSK 备考、翻译以及赴华奖学金项目的机构。起初我只是对汉字好奇，后来爱上了这门语言和它的文化。每周练声调、练笔画成了很大的基础，让我最终有勇气来江苏读书。",a:"格雷西克的 Shanhai Zhonghua，我第一次在这里写下汉字，笔画很凌乱，但一切从这里开始。",b:"初一刚开始的我，发音还不稳，却一遍遍练习声调，直到说对为止。"},
  {tag:"2019 - 2022",t:"高中时光",s:"SMA Muhammadiyah 10 GKB Gresik (Smamio)",p:"在 Smamio，我就读于一所注重职业与研究的学校。我知道了自己喜欢什么，养成做研究的习惯，也敢于承担更大的责任。",a:"一所以“职业与研究学校”为理念的学校，我的品格在这里被塑造，研究思维也开始成长。",b:"高中的我，渐渐知道自己想走的方向，也习惯通过研究寻找答案。"},
@@ -173,39 +183,52 @@ const orb=new THREE.Group();H.add(orb);
 for(let i=0;i<14;i++){const a=i/14*6.283,o=i%7<3?sym(SY[i%6],i%2?'#0f5132':'#c8102e'):coin();o.position.set(Math.cos(a)*3.6,Math.sin(i*1.7)*1.6,Math.sin(a)*3.6*.6);orb.add(o);}
 {const pts=[];for(let i=0;i<=12;i++){const x=-4.5+i*.75;pts.push(new THREE.Vector3(x,-2+(x+4.5)*.4+Math.sin(i*1.7)*.35,-1))}H.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:0xc8102e,transparent:true,opacity:.45})))}
 
-/* JOURNEY: galeri dengan karpet merah dan pilar hijau */
+/* JOURNEY: tangga naik, tiap jenjang berdiri di bordes */
 const J=new THREE.Group();J.visible=false;scene.add(J);
-const S=[{z:-18,k:'smp',l:'Spemdalas',lab:'FOTO SEKOLAH'},{z:-42,k:'cn',l:'Shanhai Zhonghua',lab:'FOTO TEMPAT KURSUS'},{z:-66,k:'sma',l:'Smamio',lab:'FOTO SEKOLAH'},{z:-90,k:'kuliah',l:'Jiangsu',lab:'FOTO KAMPUS'}],CL=[];
-const floor=new THREE.Mesh(new THREE.PlaneGeometry(24,130),std(0xefe3cb));floor.rotation.x=-Math.PI/2;floor.position.set(0,-2.4,-48);J.add(floor);
-const rug=new THREE.Mesh(new THREE.PlaneGeometry(1.8,130),std(RED));rug.rotation.x=-Math.PI/2;rug.position.set(0,-2.39,-48);J.add(rug);
-S.forEach((s,i)=>{const sc=frame(s.k+'_school','school',s.lab,2.8,2.1);sc.position.set(-3.3,.7,s.z);sc.rotation.y=.35;
- const me=frame(s.k+'_me','me','FOTO AKU',2.2,2.75);me.position.set(3.3,.9,s.z);me.rotation.y=-.35;
+const R_=7.5,Z=[-20,-48,-76,-104,-136],GY=-2.4,TRV=135.5,CL=[];
+const hAt=z=>{if(z>=Z[0]-3)return 0;for(let i=0;i<4;i++){const a=Z[i]-3,b=Z[i+1]+3;if(z<=a&&z>=b)return i*R_+R_*(a-z)/(a-b);if(z<b&&z>=Z[i+1]-3)return(i+1)*R_}return 4*R_};
+const stone=std(0xd8c7a0),carpet=std(GREEN);
+function slab(z,d,top){const m=new THREE.Mesh(new THREE.BoxGeometry(8,.9,d),stone);m.position.set(0,GY+top-.45,z);J.add(m);
+ const c=new THREE.Mesh(new THREE.BoxGeometry(1.8,.05,d),carpet);c.position.set(0,GY+top+.02,z);J.add(c)}
+slab(-3.5,27,0);
+for(let i=0;i<5;i++)slab(Z[i],6,i*R_);
+for(let i=0;i<4;i++){const a=Z[i]-3,b=Z[i+1]+3,n=18,dz=(a-b)/n;for(let k=0;k<n;k++)slab(a-(k+.5)*dz,dz+.02,i*R_+R_*(k+1)/n)}
+const S=[{z:Z[0],k:'smp',l:'Spemdalas',lab:'FOTO SEKOLAH'},{z:Z[1],k:'cn',l:'Shanhai Zhonghua',lab:'FOTO TEMPAT KURSUS'},{z:Z[2],k:'sma',l:'Smamio',lab:'FOTO SEKOLAH'},{z:Z[3],k:'kuliah',l:'Jiangsu',lab:'FOTO KAMPUS'}];
+S.forEach((s,i)=>{s.h=i*R_;const sc=frame(s.k+'_school','school',s.lab,2.8,2.1);sc.position.set(-3.3,s.h+.7,s.z);sc.rotation.y=.35;
+ const me=frame(s.k+'_me','me','FOTO AKU',2.2,2.75);me.position.set(3.3,s.h+.9,s.z);me.rotation.y=-.35;
  [[sc,'school'],[me,'me']].forEach(([f,kind])=>{const pl=f.children[1];pl.userData={fr:f,i,kind};CL.push(pl)});
  s.f=[sc,me];J.add(sc,me);
- const r=new THREE.Mesh(new THREE.TorusGeometry(1.5,.07,12,48),std(GREEN));r.rotation.x=Math.PI/2;r.position.set(0,-2.35,s.z);J.add(r);
- const lb=label(s.l);lb.position.set(0,3.5,s.z-1);J.add(lb);});
-for(let i=0;i<44;i++){const side=i%2?1:-1,z=4-Math.floor(i/2)*5.2,t=new THREE.Group();
- const col=new THREE.Mesh(new THREE.CylinderGeometry(.3,.36,5,16),std(GREEN));col.position.y=.1;
- const cap=new THREE.Mesh(new THREE.BoxGeometry(.9,.2,.9),std(0xffffff));cap.position.y=2.7;t.add(col,cap);t.position.set(side*6.4,0,z);J.add(t);}
-const pg=new THREE.BufferGeometry(),N=320,pos=new Float32Array(N*3),cl=new Float32Array(N*3);
-for(let i=0;i<N;i++){pos.set([(Math.random()-.5)*16,Math.random()*6-2,4-Math.random()*100],i*3);const c=new THREE.Color(i%2?GREEN:RED);cl.set([c.r,c.g,c.b],i*3);}
+ const r=new THREE.Mesh(new THREE.TorusGeometry(1.5,.07,12,48),std(GREEN));r.rotation.x=Math.PI/2;r.position.set(0,GY+s.h+.12,s.z);J.add(r);
+ const lb=label(s.l);lb.position.set(0,s.h+3.5,s.z-1);J.add(lb);});
+for(let z=4;z>-138;z-=6.5)for(const sd of[-1,1]){const t=new THREE.Group();
+ const col=new THREE.Mesh(new THREE.CylinderGeometry(.3,.36,12,16),std(GREEN));col.position.y=5.2;
+ const cap=new THREE.Mesh(new THREE.BoxGeometry(.9,.2,.9),std(0xffffff));cap.position.y=11.3;t.add(col,cap);t.position.set(sd*5.6,GY+hAt(z),z);J.add(t)}
+let doorP,doorM,doorGl,doorOpen=false;
+{const y=GY+4*R_,z=Z[4]-2,g=new THREE.Group();
+ const dm=new THREE.Mesh(new THREE.BoxGeometry(2.6,4.4,.15),std(RED));dm.position.set(1.3,2.3,0);dm.userData={door:true};
+ const l=new THREE.Mesh(new THREE.BoxGeometry(3.4,.35,.4),std(GREEN));l.position.y=4.65;
+ const p1=new THREE.Mesh(new THREE.BoxGeometry(.3,4.6,.4),std(GREEN));p1.position.set(-1.55,2.3,0);const p2=p1.clone();p2.position.x=1.55;
+ const kn=new THREE.Mesh(new THREE.SphereGeometry(.12,12,12),gm());kn.position.set(2.2,2.2,.12);
+ const pv=new THREE.Group();pv.position.set(-1.3,0,0);pv.add(dm,kn);g.add(pv,l,p1,p2);doorP=pv;doorM=dm;g.position.set(0,y,z);J.add(g);
+ const gl=new THREE.Mesh(new THREE.PlaneGeometry(6,7),new THREE.MeshBasicMaterial({color:0xfff6d8,transparent:true,opacity:.5}));gl.position.set(0,y+3,z-.4);J.add(gl);doorGl=gl}
+const FL=[];'学中文行书福梦华'.split('').forEach((ch,i)=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.font='96px "Noto Serif SC",serif';x.textAlign='center';x.fillStyle=i%2?'#0f5132':'#c8102e';x.fillText(ch,64,98);
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,opacity:.8})),zz=S[1].z+(i-3.5)*1.5;
+ sp.position.set((i%2?1:-1)*(6.2+(i%4)*.5),.4+Math.sin(i*2.3)*1.6+hAt(zz),zz);sp.scale.set(1.1,1.1,1);sp.userData={y:sp.position.y,p:i};J.add(sp);FL.push(sp)});
+for(let i=0;i<44;i++){const c=coin(),zz=4-Math.random()*130;c.position.set((i%2?1:-1)*(2+Math.random()*4.6),.2+Math.random()*3+hAt(zz),zz);c.userData={y:c.position.y,p:i};J.add(c);FL.push(c)}
+for(let i=0;i<16;i++){const p=sym(SY[i%6],['#c8102e','#0f5132','#b8860b'][i%3]),zz=2-i*8.5;p.position.set((i%2?1:-1)*(5+Math.random()*1.5),.5+Math.random()*2.5+hAt(zz),zz);p.userData={y:p.position.y,p:i+9};J.add(p);FL.push(p)}
+const pg=new THREE.BufferGeometry(),N=360,pos=new Float32Array(N*3),cl=new Float32Array(N*3);
+for(let i=0;i<N;i++){const zz=4-Math.random()*140;pos.set([(Math.random()-.5)*16,hAt(zz)+Math.random()*6-2,zz],i*3);const c=new THREE.Color(i%2?GREEN:RED);cl.set([c.r,c.g,c.b],i*3);}
 pg.setAttribute('position',new THREE.BufferAttribute(pos,3));pg.setAttribute('color',new THREE.BufferAttribute(cl,3));
 J.add(new THREE.Points(pg,new THREE.PointsMaterial({size:.12,vertexColors:true})));
-
-const FL=[];'学中文行书福梦华'.split('').forEach((ch,i)=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.font='96px "Noto Serif SC",serif';x.textAlign='center';x.fillStyle=i%2?'#0f5132':'#c8102e';x.fillText(ch,64,98);
- const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,opacity:.8}));sp.position.set((i%2?1:-1)*(4.9+(i%4)*.5),.4+Math.sin(i*2.3)*1.6,S[1].z+(i-3.5)*1.5);sp.scale.set(1.1,1.1,1);sp.userData={y:sp.position.y,p:i};J.add(sp);FL.push(sp)});
-
-{const pts=[];for(let i=0;i<=40;i++)pts.push(new THREE.Vector3(Math.sin(i*1.3)*.5,-2.3+i*.035+Math.sin(i*2.1)*.12,4-i*2.7));J.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),200,.04,6),gm()))}
-for(let i=0;i<36;i++){const c=coin();c.position.set((i%2?1:-1)*(1.6+Math.random()*5),.2+Math.random()*3,4-Math.random()*100);c.userData={y:c.position.y,p:i};J.add(c);FL.push(c)}
-for(let i=0;i<12;i++){const p=sym(SY[i%6],['#c8102e','#0f5132','#b8860b'][i%3]);p.position.set((i%2?1:-1)*(5+Math.random()*1.5),.5+Math.random()*2.5,2-i*8);p.userData={y:p.position.y,p:i+9};J.add(p);FL.push(p)}
-const BR=[];S.forEach(s=>[-1,1].forEach(sd=>{for(let k=0;k<3;k++){const h=1+k*.9,b=new THREE.Mesh(new THREE.BoxGeometry(.7,h,.7),std([RED,GREEN,GOLD][k]));b.position.set(sd*8.4,-2.4+h/2,s.z-5-k*1.1);J.add(b);BR.push(b)}}));
+const cLo=new THREE.Color('#e6d6b6'),cHi=new THREE.Color('#fffdf8'),cc=new THREE.Color();
+function sky(p){cc.copy(cLo).lerp(cHi,p);scene.fog.color.copy(cc);document.body.style.background='#'+cc.getHexString()}
 
 /* VIEWER: foto terbang dari bingkai ke tengah layar */
 const V=new THREE.Group(),vb=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:RED,fog:false})),vp=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial());
 vp.position.z=.001;V.add(vb,vp);V.visible=false;cam.add(V);
 let zm=null,hov=null;
 const rc=new THREE.Raycaster(),mv=new THREE.Vector2(),wp=new THREE.Vector3();
-function pick(e){mv.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);rc.setFromCamera(mv,cam);const h=rc.intersectObjects(CL);return h.length?h[0].object:null}
+function pick(e){mv.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);rc.setFromCamera(mv,cam);const h=rc.intersectObjects(doorM?CL.concat([doorM]):CL);return h.length?h[0].object:null}
 function openZ(pl){const g=pl.geometry.parameters;zm={pl,fr:pl.userData.fr,w:g.width,h:g.height,t:0,dir:1,k:pl.userData.fr.userData.b||1};
  vp.material=pl.material;vb.scale.set(1+.3/g.width,1+.3/g.height,1);V.visible=true;zm.fr.visible=false;
  const st=L[lang].st[pl.userData.i],sd=zm.fr.position.x<0?-1:1;zm.sd=sd;$('ex').className=sd<0?'r':'l';$('xY').textContent=st.tag;$('xT').textContent=st.t;$('xS').textContent=st.s;$('xP').textContent=pl.userData.kind==='school'?st.a:st.b;$('xC').textContent=L[lang].close;
@@ -223,11 +246,11 @@ let mob=false,page='home',lang='id',camZ=6,mx=0,my=0,active=-2,dive=0,diveT=0,bu
 const $=id=>document.getElementById(id),spacer=$('spacer'),dots=[...document.querySelectorAll('#dots i')];
 function setLang(l){lang=l;document.documentElement.lang=l;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=L[l][e.dataset.i]);
  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));showStage(active,true);
- $('bPrev').setAttribute('aria-label',L[l].prev);$('bNext').setAttribute('aria-label',L[l].next);try{localStorage.setItem('lang',l)}catch(e){}}
+ $('bPrev').setAttribute('aria-label',L[l].prev);$('bNext').setAttribute('aria-label',L[l].next);$('bGyro').setAttribute('aria-label',L[l].gyro);try{localStorage.setItem('lang',l)}catch(e){}}
 function showStage(i,force){if(i===active&&!force)return;active=i;const p=$('panel');
  if(i<0){p.classList.remove('show')}else{const s=L[lang].st[i];$('pTag').textContent=s.tag;$('pTtl').textContent=s.t;$('pSch').textContent=s.s;$('pTxt').textContent=s.p;p.classList.add('show')}
  dots.forEach((d,j)=>d.classList.toggle('on',j===i));}
-function go(p){page=p;H.visible=p==='home';J.visible=p==='journey';spacer.style.height=p==='journey'?'1100vh':'0';scrollTo(0,0);camZ=6;diveT=0;dive=0;lastI=-1;
+function go(p){page=p;H.visible=p==='home';J.visible=p==='journey';spacer.style.height=p==='journey'?'1650vh':'0';scrollTo(0,0);camZ=6;diveT=0;dive=0;lastI=-1;viewYaw=0;viewPitch=0;rst=0;document.body.classList.toggle('jr',p==='journey');document.body.style.background='';scene.fog.color.set(0xf8f1e4);
  $('homeUI').classList.toggle('on',p==='home');$('jUI').classList.toggle('on',p==='journey');
  $('nHome').classList.toggle('on',p==='home');$('nJ').classList.toggle('on',p==='journey');showStage(-1,true);}
 function warp(p){if(busy||p===page||zm)return;
@@ -240,29 +263,44 @@ $('nHome').onclick=()=>warp('home');$('nJ').onclick=()=>warp('journey');$('cta')
 document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;
  if(page==='journey'&&!zm&&!busy){hov=pick(e);document.body.style.cursor=hov?'pointer':''}});
-addEventListener('click',e=>{if(e.target.closest('header,.nv'))return;if(zm){closeZ();return}
- if(page!=='journey'||busy)return;const h=pick(e);if(h)openZ(h)});
+addEventListener('click',e=>{if(e.target.closest('header,.nv,.gy'))return;if(moved>8){moved=0;return}if(zm){closeZ();return}
+ if(page!=='journey'||busy)return;const h=pick(e);if(h===doorM)doorOpen=!doorOpen;else if(h)openZ(h)});
 addEventListener('keydown',e=>{if(e.key==='Escape')closeZ()});
-const W=()=>[6,...S.map(s=>s.z+8)];let tgt=null,tt=0,lastI=-1;
+let viewYaw=0,viewPitch=0,rst=0,dragging=false,px=0,py=0,moved=0,gOn=false,gyT=0,gpT=0,gys=0,gps=0;const g0={a:null,b:null};
+addEventListener('pointerdown',e=>{if(page!=='journey'||zm||e.target.closest('button,header'))return;dragging=true;px=e.clientX;py=e.clientY;moved=0});
+addEventListener('pointermove',e=>{if(!dragging||zm)return;const dx=e.clientX-px,dy=e.clientY-py;px=e.clientX;py=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);if(moved>8)document.body.classList.add('drag');
+ viewYaw+=dx*.006;if(e.pointerType!=='touch')viewPitch=Math.max(-1.3,Math.min(1.3,viewPitch+dy*.005))});
+const endDrag=()=>{dragging=false;document.body.classList.remove('drag')};addEventListener('pointerup',endDrag);addEventListener('pointercancel',endDrag);
+function onOri(e){if(e.alpha==null)return;if(g0.a===null){g0.a=e.alpha;g0.b=e.beta}let da=e.alpha-g0.a;da-=Math.round(da/360)*360;gyT=da*Math.PI/180;gpT=(e.beta-g0.b)*Math.PI/180}
+async function toggleGyro(){if(gOn){gOn=false;removeEventListener('deviceorientation',onOri);$('bGyro').classList.remove('act');return}
+ try{if(typeof DeviceOrientationEvent!=='undefined'&&DeviceOrientationEvent.requestPermission){if(await DeviceOrientationEvent.requestPermission()!=='granted')return}}catch(e){return}
+ g0.a=null;gOn=true;addEventListener('deviceorientation',onOri);$('bGyro').classList.add('act')}
+$('bGyro').onclick=toggleGyro;
+const W=()=>[6,...S.map(s=>s.z+8),Z[4]+6.5];let tgt=null,tt=0,lastI=-1;
 function idxNow(){const w=W();let b=0;w.forEach((z,i)=>{if(Math.abs(z-camZ)<Math.abs(w[b]-camZ))b=i});return b}
 function stepNav(d){if(zm||page!=='journey')return;const w=W(),max=document.documentElement.scrollHeight-innerHeight,n=Math.max(0,Math.min(w.length-1,(tgt!==null?tgt:idxNow())+d));
- tgt=n;scrollTo({top:(6-w[n])/90*max,behavior:'smooth'});clearTimeout(tt);tt=setTimeout(()=>tgt=null,1400)}
+ tgt=n;rst=45;scrollTo({top:(6-w[n])/TRV*max,behavior:'smooth'});clearTimeout(tt);tt=setTimeout(()=>tgt=null,1400)}
 $('bPrev').onclick=()=>stepNav(-1);$('bNext').onclick=()=>stepNav(1);
 function resize(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);mob=w<=760||w/h<.9;cam.fov=mob?80:55;R.setPixelRatio(Math.min(devicePixelRatio,mob?1.5:2));cam.aspect=w/h;cam.updateProjectionMatrix();
  const wide=w/h>1.1&&w>760;H.position.set(wide?2.6:0,wide?0:2.3,0);H.scale.setScalar(wide?1:.55);
  S.forEach(s=>{const[a,b]=s.f;a.position.x=mob?-2:-3.3;b.position.x=mob?2:3.3;a.rotation.y=mob?.2:.35;b.rotation.y=mob?-.2:-.35;a.userData.b=b.userData.b=mob?.55:1});
- FL.forEach((f,i)=>f.visible=!mob||i%3===0);BR.forEach((b,i)=>b.visible=!mob||i%6<3);}
+ FL.forEach((f,i)=>f.visible=!mob||i%3===0);}
 addEventListener('resize',resize);resize();
 
 const clock=new THREE.Clock();
 function tick(){requestAnimationFrame(tick);const dt=Math.min(clock.getDelta(),.05),t=clock.elapsedTime;CO.forEach(c=>c.rotation.y+=.03);
  if(page==='home'){dive+=(diveT-dive)*.05;H.rotation.y+=((mob?0:mx)*.4-H.rotation.y)*.05;H.rotation.x+=((mob?0:my)*.25-H.rotation.x)*.05;hf.position.y=Math.sin(t)*.12;orb.rotation.y=t*.25+dive*3;ring.rotation.z=t*.1;
   cam.position.set(0,0,7-dive*3.2);cam.lookAt(H.position.x*.4,H.position.y*.4,0);}
- else{const max=document.documentElement.scrollHeight-innerHeight,p=max>0?scrollY/max:0;camZ+=((6-p*90)-camZ)*.08;
-  cam.position.set(Math.sin(t*.4)*.3,.5+Math.cos(t*.3)*.1,camZ);cam.lookAt(0,.3,camZ-10);
-  S.forEach(s=>s.f.forEach((f,j)=>{f.position.y=(j?.9:.7)+Math.sin(t+s.z+j)*.12;const tg=(hov&&hov.userData.fr===f&&!zm?1.07:1)*(f.userData.b||1);f.scale.setScalar(f.scale.x+(tg-f.scale.x)*.15)}));
+ else{const max=document.documentElement.scrollHeight-innerHeight,p=max>0?scrollY/max:0;camZ+=((6-p*TRV)-camZ)*.08;
+  cam.position.set(Math.sin(t*.4)*.2,.5+hAt(camZ-4)+Math.sin(camZ*1.6)*.05,camZ);const by=Math.atan2((.3+hAt(camZ-12))-(.5+hAt(camZ-4)),10);
+  if(rst>0){viewYaw-=Math.round(viewYaw/6.2832)*6.2832;viewYaw*=.9;viewPitch*=.9;rst--}else if(!dragging&&!gOn)viewPitch*=.985;
+  gys+=(gyT-gys)*.2;gps+=(gpT-gps)*.2;
+  cam.rotation.order='YXZ';cam.rotation.set(Math.max(-1.3,Math.min(1.3,by+viewPitch+(gOn?gps:0))),viewYaw+(gOn?gys:0),0);
+  if(doorP){doorP.rotation.y+=((doorOpen?1.6:0)-doorP.rotation.y)*.06;doorGl.material.opacity=.5+doorP.rotation.y/1.6*.45}
+  sky(p);
+  S.forEach(s=>s.f.forEach((f,j)=>{f.position.y=s.h+(j?.9:.7)+Math.sin(t+s.z+j)*.12;const tg=(hov&&hov.userData.fr===f&&!zm?1.07:1)*(f.userData.b||1);f.scale.setScalar(f.scale.x+(tg-f.scale.x)*.15)}));
   FL.forEach(f=>f.position.y=f.userData.y+Math.sin(t*.8+f.userData.p)*.3);showStage(S.findIndex(s=>{const d=camZ-s.z;return d>3&&d<13}));
-  {const i=idxNow();if(i!==lastI){lastI=i;$('bPrev').classList.toggle('off',i<2);$('bNext').classList.toggle('off',i>=W().length-1)}}$('intro').style.opacity=Math.max(0,Math.min(1,(camZ-4.6)/1.4));
+  {const i=idxNow();if(i!==lastI){lastI=i;$('bPrev').classList.toggle('off',i<2);$('bNext').classList.toggle('off',i>=W().length-1)}}$('outro').style.opacity=Math.max(0,Math.min(1,(-camZ-118)/8));$('intro').style.opacity=Math.max(0,Math.min(1,(camZ-4.6)/1.4));
   cam.updateMatrixWorld();stepZ(dt);}
  R.render(scene,cam);}
 let saved='id';try{saved=localStorage.getItem('lang')||'id'}catch(e){}
