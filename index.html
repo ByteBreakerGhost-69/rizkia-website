@@ -77,6 +77,14 @@ button{padding:8px 12px;min-height:40px;font-size:.88rem}
 #ex h2{font-size:1.5rem}#ex p{font-size:.95rem}
 }
 @media (prefers-reduced-motion:reduce){.ui,#panel,#veil,#ex{transition:none}}
+.nv{display:none}
+@media (max-width:760px),(max-aspect-ratio:9/10){
+.nv{display:flex;position:absolute;bottom:3vh;width:38px;height:38px;min-height:0;padding:0;border-radius:50%;background:var(--red);color:#fff;align-items:center;justify-content:center;pointer-events:auto;transition:opacity .3s}
+.nv svg{width:18px;height:18px}
+#bPrev{left:2vw}#bNext{right:2vw}
+.nv.off,body.zoom .nv{opacity:0;pointer-events:none}
+#panel{width:calc(100vw - 104px)}
+}
 </style>
 </head>
 <body data-page="home">
@@ -98,6 +106,8 @@ button{padding:8px 12px;min-height:40px;font-size:.88rem}
   <div id="intro"><h2 data-i="jTitle"></h2><p data-i="hint"></p></div>
   <div id="panel"><div class="tag" id="pTag"></div><h3 id="pTtl"></h3><h4 id="pSch"></h4><p id="pTxt"></p></div>
   <div id="dots"><i></i><i></i><i></i><i></i></div>
+  <button class="nv off" id="bPrev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button class="nv" id="bNext"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
 </section>
 <div id="veil"></div>
 <div id="ex"><small id="xY"></small><h2 id="xT"></h2><h4 id="xS"></h4><p id="xP"></p><em id="xC"></em></div>
@@ -107,24 +117,24 @@ button{padding:8px 12px;min-height:40px;font-size:.88rem}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* ===== FOTO: isi path/URL gambar di sini untuk mengganti placeholder ===== */
-const PHOTOS={home:"images/rizkia.jpeg",smp_school:"",smp_me:"",cn_school:"",cn_me:"",sma_school:"",sma_me:"",kuliah_school:"images/jiangsu.png",kuliah_me:"images/rizkia-kuliah.jpeg"};
+const PHOTOS={home:"",smp_school:"",smp_me:"",cn_school:"",cn_me:"",sma_school:"",sma_me:"",kuliah_school:"",kuliah_me:""};
 
 const L={
-id:{stPill:"Statusku sekarang",stText:"Mahasiswa di Jiangsu Vocational Institute of Commerce",navHome:"Beranda",navJ:"Perjalananku",phil:"Setiap langkah kecil adalah akar dari tumbuh yang besar.",cta:"Lihat perjalananku",jTitle:"Perjalananku",hint:"Gulir ke bawah untuk berjalan maju. Klik foto untuk memperbesar.",close:"Klik di mana saja untuk menutup",
- st:[{tag:"2020 - 2023",t:"Masa SMP",s:"SMP Muhammadiyah 12 GKB Gresik (Spemdalas)",p:"Awal dari rasa ingin tahu. Spemdalas dikenal sebagai sekolah berbasis teknologi digital pertama di Gresik dengan kurikulum bergaya internasional. Di sini aku berani bertanya, mencoba ekskul pertama, dan menemukan teman yang masih berarti sampai sekarang.",a:"Sekolah swasta unggulan yang dikenal sebagai pelopor sekolah teknologi digital di Gresik. Banyak kebiasaan belajarku dimulai dari sini.",b:"Aku di masa SMP, penuh rasa ingin tahu dan baru mengenal ekskul pertamaku. Waktu itu semuanya terasa baru."},
+id:{stPill:"Statusku sekarang",stText:"Mahasiswa di Jiangsu Vocational Institute of Commerce",navHome:"Beranda",navJ:"Perjalananku",phil:"Setiap langkah kecil adalah akar dari tumbuh yang besar.",cta:"Lihat perjalananku",jTitle:"Perjalananku",hint:"Gulir ke bawah untuk berjalan maju. Klik foto untuk memperbesar.",close:"Klik di mana saja untuk menutup",prev:"Sebelumnya",next:"Berikutnya",
+ st:[{tag:"2016 - 2019",t:"Masa SMP",s:"SMP Muhammadiyah 12 GKB Gresik (Spemdalas)",p:"Awal dari rasa ingin tahu. Spemdalas dikenal sebagai sekolah berbasis teknologi digital pertama di Gresik dengan kurikulum bergaya internasional. Di sini aku berani bertanya, mencoba ekskul pertama, dan menemukan teman yang masih berarti sampai sekarang.",a:"Sekolah swasta unggulan yang dikenal sebagai pelopor sekolah teknologi digital di Gresik. Banyak kebiasaan belajarku dimulai dari sini.",b:"Aku di masa SMP, penuh rasa ingin tahu dan baru mengenal ekskul pertamaku. Waktu itu semuanya terasa baru."},
  {tag:"Sejak kelas 7 SMP",t:"Kursus bahasa Mandarin",s:"Shanhai Zhonghua, Gresik",p:"Di awal kelas 7 aku mulai kursus di Shanhai Zhonghua, Gresik, lembaga yang fokus pada Mandarin intensif, persiapan ujian HSK, penerjemahan, hingga program beasiswa ke China. Awalnya aku hanya penasaran pada aksaranya, lama-lama jatuh cinta pada bahasa dan budayanya. Latihan nada dan goresan tiap pekan menjadi bekal besar sampai aku berani kuliah di Jiangsu.",a:"Shanhai Zhonghua di Gresik, tempat aku pertama kali menulis aksara Mandarin. Goresan pertamaku berantakan, tapi dari sinilah semuanya dimulai.",b:"Aku di awal kelas 7, masih terbata-bata tapi semangat mengulang nada demi nada sampai terdengar benar."},
- {tag:"2023 - 2026",t:"Masa SMA",s:"SMA Muhammadiyah 10 GKB Gresik (Smamio)",p:"Di Smamio aku belajar di sekolah yang menekankan karier dan riset. Aku mulai tahu apa yang kusuka, melatih kebiasaan meneliti, dan berani memegang tanggung jawab yang lebih besar.",a:"Sekolah yang mengusung konsep Career and Research School. Di sini karakterku dibentuk dan cara berpikir risetku mulai tumbuh.",b:"Aku di masa SMA, mulai tahu arah yang ingin kutuju dan terbiasa mencari jawaban lewat riset."},
- {tag:"2026 - sekarang",t:"Masa kuliah",s:"Jiangsu Vocational Institute of Commerce",p:"Dunia terasa lebih luas. Aku belajar mandiri, membangun proyek nyata, dan menyiapkan langkah berikutnya.",a:"Kampus di Jiangsu, Tiongkok, tempat duniaku terasa makin luas dan tantangannya makin nyata.",b:"Aku di masa kuliah, belajar mandiri dan membangun proyek yang benar-benar dipakai orang."}]},
-en:{stPill:"My status now",stText:"Student at Jiangsu Vocational Institute of Commerce",navHome:"Home",navJ:"My Journey",phil:"Every small step is the root of great growth.",cta:"See my journey",jTitle:"My Journey",hint:"Scroll down to walk forward. Click a photo to enlarge it.",close:"Click anywhere to close",
- st:[{tag:"2020 - 2023",t:"Junior high",s:"SMP Muhammadiyah 12 GKB Gresik (Spemdalas)",p:"Where curiosity began. Spemdalas is known as the first digital-technology school in Gresik, with an international-style curriculum. Here I learned to ask questions, tried my first club, and met friends who still matter today.",a:"A leading private school known as a digital-technology pioneer in Gresik. Many of my study habits started here.",b:"Me in junior high, full of curiosity and just discovering my first club. Everything felt new."},
+ {tag:"2019 - 2022",t:"Masa SMA",s:"SMA Muhammadiyah 10 GKB Gresik (Smamio)",p:"Di Smamio aku belajar di sekolah yang menekankan karier dan riset. Aku mulai tahu apa yang kusuka, melatih kebiasaan meneliti, dan berani memegang tanggung jawab yang lebih besar.",a:"Sekolah yang mengusung konsep Career and Research School. Di sini karakterku dibentuk dan cara berpikir risetku mulai tumbuh.",b:"Aku di masa SMA, mulai tahu arah yang ingin kutuju dan terbiasa mencari jawaban lewat riset."},
+ {tag:"2022 - 2025",t:"Masa kuliah",s:"Jiangsu Vocational Institute of Commerce",p:"Dunia terasa lebih luas. Aku belajar mandiri, membangun proyek nyata, dan menyiapkan langkah berikutnya.",a:"Kampus di Jiangsu, Tiongkok, tempat duniaku terasa makin luas dan tantangannya makin nyata.",b:"Aku di masa kuliah, belajar mandiri dan membangun proyek yang benar-benar dipakai orang."}]},
+en:{stPill:"My status now",stText:"Student at Jiangsu Vocational Institute of Commerce",navHome:"Home",navJ:"My Journey",phil:"Every small step is the root of great growth.",cta:"See my journey",jTitle:"My Journey",hint:"Scroll down to walk forward. Click a photo to enlarge it.",close:"Click anywhere to close",prev:"Previous",next:"Next",
+ st:[{tag:"2016 - 2019",t:"Junior high",s:"SMP Muhammadiyah 12 GKB Gresik (Spemdalas)",p:"Where curiosity began. Spemdalas is known as the first digital-technology school in Gresik, with an international-style curriculum. Here I learned to ask questions, tried my first club, and met friends who still matter today.",a:"A leading private school known as a digital-technology pioneer in Gresik. Many of my study habits started here.",b:"Me in junior high, full of curiosity and just discovering my first club. Everything felt new."},
  {tag:"Since grade 7",t:"Mandarin course",s:"Shanhai Zhonghua, Gresik",p:"At the start of grade 7 I began studying at Shanhai Zhonghua in Gresik, an institute focused on intensive Mandarin, HSK exam prep, translation, and scholarship programs for China. At first I was only curious about the characters, then I fell in love with the language and culture. Weekly tone and stroke practice became a big foundation, until I felt brave enough to study in Jiangsu.",a:"Shanhai Zhonghua in Gresik, where I first wrote Chinese characters. My first strokes were messy, but this is where it all began.",b:"Me at the start of grade 7, still stumbling but eager to repeat each tone until it sounded right."},
- {tag:"2023 - 2026",t:"Senior high",s:"SMA Muhammadiyah 10 GKB Gresik (Smamio)",p:"At Smamio I studied at a school that stresses career and research. I learned what I love, built a habit of doing research, and took on bigger responsibilities.",a:"A school built around the Career and Research School concept. My character was shaped here and my research mindset began to grow.",b:"Me in senior high, starting to know the direction I wanted and getting used to finding answers through research."},
- {tag:"2026 - sekarang",t:"University",s:"Jiangsu Vocational Institute of Commerce",p:"The world felt wider. I learned independence, built real projects, and prepared for the next step.",a:"The campus in Jiangsu, China, where my world grew wider and the challenges became real.",b:"Me at university, learning independence and building projects people actually use."}]},
-zh:{stPill:"目前身份",stText:"江苏商贸职业学院学生",navHome:"首页",navJ:"我的旅程",phil:"每一小步，都是成长的根。",cta:"查看我的旅程",jTitle:"我的旅程",hint:"向下滚动前行，点击照片可放大。",close:"点击任意处关闭",
- st:[{tag:"2020 - 2023",t:"初中时光",s:"SMP Muhammadiyah 12 GKB Gresik (Spemdalas)",p:"好奇心开始的地方。Spemdalas 被称为格雷西克第一所数字科技学校，采用国际风格的课程。我在这里学会提问，参加了第一个社团，也遇到了至今仍重要的朋友。",a:"一所杰出的私立学校，是格雷西克数字科技学校的先行者。我许多学习习惯从这里开始。",b:"初中的我，充满好奇，刚加入第一个社团，一切都很新鲜。"},
+ {tag:"2019 - 2022",t:"Senior high",s:"SMA Muhammadiyah 10 GKB Gresik (Smamio)",p:"At Smamio I studied at a school that stresses career and research. I learned what I love, built a habit of doing research, and took on bigger responsibilities.",a:"A school built around the Career and Research School concept. My character was shaped here and my research mindset began to grow.",b:"Me in senior high, starting to know the direction I wanted and getting used to finding answers through research."},
+ {tag:"2022 - 2025",t:"University",s:"Jiangsu Vocational Institute of Commerce",p:"The world felt wider. I learned independence, built real projects, and prepared for the next step.",a:"The campus in Jiangsu, China, where my world grew wider and the challenges became real.",b:"Me at university, learning independence and building projects people actually use."}]},
+zh:{stPill:"目前身份",stText:"江苏商贸职业学院学生",navHome:"首页",navJ:"我的旅程",phil:"每一小步，都是成长的根。",cta:"查看我的旅程",jTitle:"我的旅程",hint:"向下滚动前行，点击照片可放大。",close:"点击任意处关闭",prev:"上一个",next:"下一个",
+ st:[{tag:"2016 - 2019",t:"初中时光",s:"SMP Muhammadiyah 12 GKB Gresik (Spemdalas)",p:"好奇心开始的地方。Spemdalas 被称为格雷西克第一所数字科技学校，采用国际风格的课程。我在这里学会提问，参加了第一个社团，也遇到了至今仍重要的朋友。",a:"一所杰出的私立学校，是格雷西克数字科技学校的先行者。我许多学习习惯从这里开始。",b:"初中的我，充满好奇，刚加入第一个社团，一切都很新鲜。"},
  {tag:"初一起",t:"中文课程",s:"Shanhai Zhonghua, Gresik",p:"初一开学时，我开始在格雷西克的 Shanhai Zhonghua 学习，这是一所专注于中文强化、HSK 备考、翻译以及赴华奖学金项目的机构。起初我只是对汉字好奇，后来爱上了这门语言和它的文化。每周练声调、练笔画成了很大的基础，让我最终有勇气来江苏读书。",a:"格雷西克的 Shanhai Zhonghua，我第一次在这里写下汉字，笔画很凌乱，但一切从这里开始。",b:"初一刚开始的我，发音还不稳，却一遍遍练习声调，直到说对为止。"},
- {tag:"2023 - 2026",t:"高中时光",s:"SMA Muhammadiyah 10 GKB Gresik (Smamio)",p:"在 Smamio，我就读于一所注重职业与研究的学校。我知道了自己喜欢什么，养成做研究的习惯，也敢于承担更大的责任。",a:"一所以“职业与研究学校”为理念的学校，我的品格在这里被塑造，研究思维也开始成长。",b:"高中的我，渐渐知道自己想走的方向，也习惯通过研究寻找答案。"},
- {tag:"2026 - sekarang",t:"大学时光",s:"江苏商贸职业学院",p:"世界变得更宽广。我学会独立，做出真实的项目，并为下一步做准备。",a:"在江苏的这座校园里，我的世界变得更宽广，挑战也更真实。",b:"大学的我，学会独立，做出真正有人使用的项目。"}]}};
+ {tag:"2019 - 2022",t:"高中时光",s:"SMA Muhammadiyah 10 GKB Gresik (Smamio)",p:"在 Smamio，我就读于一所注重职业与研究的学校。我知道了自己喜欢什么，养成做研究的习惯，也敢于承担更大的责任。",a:"一所以“职业与研究学校”为理念的学校，我的品格在这里被塑造，研究思维也开始成长。",b:"高中的我，渐渐知道自己想走的方向，也习惯通过研究寻找答案。"},
+ {tag:"2022 - 2025",t:"大学时光",s:"江苏商贸职业学院",p:"世界变得更宽广。我学会独立，做出真实的项目，并为下一步做准备。",a:"在江苏的这座校园里，我的世界变得更宽广，挑战也更真实。",b:"大学的我，学会独立，做出真正有人使用的项目。"}]}};
 
 const cv=document.getElementById('c');
 const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -213,11 +223,11 @@ let mob=false,page='home',lang='id',camZ=6,mx=0,my=0,active=-2,dive=0,diveT=0,bu
 const $=id=>document.getElementById(id),spacer=$('spacer'),dots=[...document.querySelectorAll('#dots i')];
 function setLang(l){lang=l;document.documentElement.lang=l;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=L[l][e.dataset.i]);
  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));showStage(active,true);
- try{localStorage.setItem('lang',l)}catch(e){}}
+ $('bPrev').setAttribute('aria-label',L[l].prev);$('bNext').setAttribute('aria-label',L[l].next);try{localStorage.setItem('lang',l)}catch(e){}}
 function showStage(i,force){if(i===active&&!force)return;active=i;const p=$('panel');
  if(i<0){p.classList.remove('show')}else{const s=L[lang].st[i];$('pTag').textContent=s.tag;$('pTtl').textContent=s.t;$('pSch').textContent=s.s;$('pTxt').textContent=s.p;p.classList.add('show')}
  dots.forEach((d,j)=>d.classList.toggle('on',j===i));}
-function go(p){page=p;H.visible=p==='home';J.visible=p==='journey';spacer.style.height=p==='journey'?'1100vh':'0';scrollTo(0,0);camZ=6;diveT=0;dive=0;
+function go(p){page=p;H.visible=p==='home';J.visible=p==='journey';spacer.style.height=p==='journey'?'1100vh':'0';scrollTo(0,0);camZ=6;diveT=0;dive=0;lastI=-1;
  $('homeUI').classList.toggle('on',p==='home');$('jUI').classList.toggle('on',p==='journey');
  $('nHome').classList.toggle('on',p==='home');$('nJ').classList.toggle('on',p==='journey');showStage(-1,true);}
 function warp(p){if(busy||p===page||zm)return;
@@ -230,9 +240,14 @@ $('nHome').onclick=()=>warp('home');$('nJ').onclick=()=>warp('journey');$('cta')
 document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;
  if(page==='journey'&&!zm&&!busy){hov=pick(e);document.body.style.cursor=hov?'pointer':''}});
-addEventListener('click',e=>{if(e.target.closest('header'))return;if(zm){closeZ();return}
+addEventListener('click',e=>{if(e.target.closest('header,.nv'))return;if(zm){closeZ();return}
  if(page!=='journey'||busy)return;const h=pick(e);if(h)openZ(h)});
 addEventListener('keydown',e=>{if(e.key==='Escape')closeZ()});
+const W=()=>[6,...S.map(s=>s.z+8)];let tgt=null,tt=0,lastI=-1;
+function idxNow(){const w=W();let b=0;w.forEach((z,i)=>{if(Math.abs(z-camZ)<Math.abs(w[b]-camZ))b=i});return b}
+function stepNav(d){if(zm||page!=='journey')return;const w=W(),max=document.documentElement.scrollHeight-innerHeight,n=Math.max(0,Math.min(w.length-1,(tgt!==null?tgt:idxNow())+d));
+ tgt=n;scrollTo({top:(6-w[n])/90*max,behavior:'smooth'});clearTimeout(tt);tt=setTimeout(()=>tgt=null,1400)}
+$('bPrev').onclick=()=>stepNav(-1);$('bNext').onclick=()=>stepNav(1);
 function resize(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);mob=w<=760||w/h<.9;cam.fov=mob?80:55;R.setPixelRatio(Math.min(devicePixelRatio,mob?1.5:2));cam.aspect=w/h;cam.updateProjectionMatrix();
  const wide=w/h>1.1&&w>760;H.position.set(wide?2.6:0,wide?0:2.3,0);H.scale.setScalar(wide?1:.55);
  S.forEach(s=>{const[a,b]=s.f;a.position.x=mob?-2:-3.3;b.position.x=mob?2:3.3;a.rotation.y=mob?.2:.35;b.rotation.y=mob?-.2:-.35;a.userData.b=b.userData.b=mob?.55:1});
@@ -247,7 +262,7 @@ function tick(){requestAnimationFrame(tick);const dt=Math.min(clock.getDelta(),.
   cam.position.set(Math.sin(t*.4)*.3,.5+Math.cos(t*.3)*.1,camZ);cam.lookAt(0,.3,camZ-10);
   S.forEach(s=>s.f.forEach((f,j)=>{f.position.y=(j?.9:.7)+Math.sin(t+s.z+j)*.12;const tg=(hov&&hov.userData.fr===f&&!zm?1.07:1)*(f.userData.b||1);f.scale.setScalar(f.scale.x+(tg-f.scale.x)*.15)}));
   FL.forEach(f=>f.position.y=f.userData.y+Math.sin(t*.8+f.userData.p)*.3);showStage(S.findIndex(s=>{const d=camZ-s.z;return d>3&&d<13}));
-  $('intro').style.opacity=Math.max(0,Math.min(1,(camZ-4.6)/1.4));
+  {const i=idxNow();if(i!==lastI){lastI=i;$('bPrev').classList.toggle('off',i<2);$('bNext').classList.toggle('off',i>=W().length-1)}}$('intro').style.opacity=Math.max(0,Math.min(1,(camZ-4.6)/1.4));
   cam.updateMatrixWorld();stepZ(dt);}
  R.render(scene,cam);}
 let saved='id';try{saved=localStorage.getItem('lang')||'id'}catch(e){}
